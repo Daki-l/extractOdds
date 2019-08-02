@@ -1,32 +1,33 @@
 <template>
   <div class="hello">
-    <div class="btn-list">
-      <button @click="btnClick">抽取</button>
-      <button @click="btnClickTen">抽取10次</button>
-      <button @click="resetClick">加载小黄书概率</button>
-      <button @click="resetClick2">加载光暗概率</button>
-      <button @click="automatic">自动抽取5抽每次</button>
-      <button @click="stop">停止</button>
-      <button @click="clearClick">clear</button>
-    </div>
-    <div class="probxx-box">
-        <p>概率 {{ parseFloat(fiveProbxx) + parseFloat(fourProbxx) + '%'}}</p>
-        总数&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{getArr.length}} 个
-        <p>
-            <span v-if="isYellow">(0.5%)</span>
-            <span v-if="!isYellow">(0.3%)</span>
-            5星
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            {{fiveProbxx + '%'}}
-
-        </p>
-        <p>
-            <span v-if="isYellow">(8.0%)</span>
-            <span v-if="!isYellow">(6.0%)</span>
-            4星
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            {{fourProbxx+ '%'}}
-        </p>
+    <div class="left-box">
+        <div class="btn-list">
+        <button @click="btnClick">抽取</button>
+        <button @click="btnClickTen">抽取10次</button>
+        <button @click="resetClick">小黄书概率</button>
+        <button @click="resetClick2">光暗概率</button>
+        <button @click="automatic">自动抽取</button>
+        <button @click="stop">停止</button>
+        <button @click="clearClick">clear</button>
+        </div>
+        <div class="probxx-box">
+            <p>概率 {{ allproba()  + '%' }}</p>
+            总数<br>{{getArr.length}} 个
+            <p>
+                <span v-if="isYellow">(0.5%)</span>
+                <span v-if="!isYellow">(0.3%)</span>
+                5星
+                <br>
+                {{ !!fiveProbxx ? fiveProbxx : 0 + '%'}}
+            </p>
+            <p>
+                <span v-if="isYellow">(8.0%)</span>
+                <span v-if="!isYellow">(6.0%)</span>
+                4星
+                <br>
+                {{fourProbxx+ '%'}}
+            </p>
+        </div>
     </div>
     <div class="result-box" id="box">
         <h4>抽取结果</h4>
@@ -45,6 +46,7 @@ export default {
             msg: '',
             isYellow: true,
             time: '',
+            clickColum: 0,
             temArr: [],
             getArr: []
         };
@@ -195,37 +197,43 @@ export default {
             this.init();
             this.rloading2();
         },
-        myErval() {
-            
+        allproba() {
+            let member = parseFloat(this.fiveProbxx) + parseFloat(this.fourProbxx);
+            member = !!member ? member.toFixed(2) : 0;
+            return member;
         },
         // 自动抽取每次10抽
         automatic(type) {
-            var arr = this.temArr;
-            var mi = 0;
-            this.time = setInterval(() => {
-                mi++;
-                for (var i = 0; i < 10; i ++) {
-                    if (mi > 1000) {
-                        console.log(i)
-                        clearInterval(this.time);
-                        return;
+            this.clickColum++;
+            if (this.clickColum <= 1) {
+                var arr = this.temArr;
+                var mi = 0;
+                this.time = setInterval(() => {
+                    mi++;
+                    for (var i = 0; i < 10; i ++) {
+                        if (mi > 1000) {
+                            console.log(i)
+                            clearInterval(this.time);
+                            return;
+                        }
+                        var idd = parseInt(Math.random() * 1000);
+                        this.getArr.push({
+                            name: arr[idd].name,
+                            type: arr[idd].type,
+                            id: arr[idd].id
+                        });
                     }
-                    var idd = parseInt(Math.random() * 1000);
-                    this.getArr.push({
-                        name: arr[idd].name,
-                        type: arr[idd].type,
-                        id: arr[idd].id
-                    });
-                }
-            }, 300)
+                }, 300)
+            }
         },
         stop() {
+            this.clickColum = 0;
             clearInterval(this.time);
         },
         // 清除
         clearClick() {
             this.getArr = [];
-        },
+        }
     },
     computed: {
         fiveProbxx() {
@@ -239,7 +247,7 @@ export default {
                 }
             }
             r = k / len * 100;
-            return r.toFixed(2);
+            return !!r ? r.toFixed(2) : 0;
         },
         fourProbxx() {
             var r = 0;
@@ -252,7 +260,7 @@ export default {
                 }
             }
             r = k / len * 100;
-            return r.toFixed(2);
+            return !!r ? r.toFixed(2) : 0;
         }
     }
 };
@@ -260,38 +268,34 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.left-box {
+    width: 34%;
+    margin-top: 60px;
+}
 .btn-list{
     overflow: hidden;
-    position: absolute;
-    left: 10%;
-    width: 250px;
     line-height: 30px;
 }
 .btn-list button{
     margin-left: 5px;
 }
-.probxx-box{
-    position: absolute;
-    left: 15%;
-    top: 170px;
-}
 
 .result-box{
     float: right;
     width: 60%;
-    border: solid 1px black;
-    height: 800px;
-    overflow-y: auto;
     position: absolute;
     right: 20px;
     top: 20px;
 }
 .result-item{
     text-align: left;
+    border: solid 1px black;
+    height: 70vh;
+    overflow-y: auto;
 }
 .result-item span{
     display: inline-block;
-    width: 100px;
+    width: 55px;
     text-align: center;
     margin-bottom: 10px;
 }
