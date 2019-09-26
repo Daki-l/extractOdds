@@ -35,12 +35,17 @@
             <span v-for="(data, index) in getArr" :key="index" :class="data.type">{{data.name}}</span>
         </div>
     </div>
+    <echars ref="myEchars"></echars>
   </div>
 </template>
 
 <script>
+import Echars from './echars';
 export default {
     name: 'HelloWorld',
+    components: {
+        Echars
+    },
     data() {
         return {
             msg: '',
@@ -102,7 +107,6 @@ export default {
                         break;
                     }
                 }
-                
             }
             // 生成4星数据
             for (var i = 0; i < 80; i++) {
@@ -120,7 +124,7 @@ export default {
                     }
                 }
             }
-
+            console.log('fiveArrIndexArr', fiveArrIndexArr, fourArrIndexArr)
             for (var i = 0; i < fiveArrIndexArr.length; i++) {
                 this.temArr[fiveArrIndexArr[i]] = {
                     name: '五星',
@@ -206,13 +210,21 @@ export default {
         automatic(type) {
             this.clickColum++;
             if (this.clickColum <= 1) {
+                let momIndx = 0;
+                // 一个临时的数组用来储存1秒产生的数据
+                let momArr = [];
                 var arr = this.temArr;
                 var mi = 0;
                 this.time = setInterval(() => {
                     mi++;
-                    for (var i = 0; i < 10; i ++) {
+                    momIndx++;
+                    if (momIndx > 2) {
+                        this.$refs.myEchars.addNewData(momArr, this.allproba());
+                        momIndx = 1;
+                        momArr = [];
+                    }
+                    for (var i = 0; i < 20; i++) {
                         if (mi > 1000) {
-                            console.log(i)
                             clearInterval(this.time);
                             return;
                         }
@@ -222,8 +234,16 @@ export default {
                             type: arr[idd].type,
                             id: arr[idd].id
                         });
+                        momArr.push({
+                            name: arr[idd].name,
+                            type: arr[idd].type,
+                            id: arr[idd].id
+                        });
                     }
-                }, 300)
+                    if (this.getArr.length >= 10000) {
+                        this.clearClick();
+                    }
+                }, 100);
             }
         },
         stop() {
@@ -233,6 +253,7 @@ export default {
         // 清除
         clearClick() {
             this.getArr = [];
+            this.$refs.myEchars.clear();
         }
     },
     computed: {
