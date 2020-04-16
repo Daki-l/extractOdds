@@ -67,7 +67,8 @@ export default {
             let momAllrPro = '';
             let momFourPro = this.getPro(data, 'four');
             let momFivePro = this.getPro(data, 'five');
-            momAllrPro = parseInt(momFourPro + momFivePro);
+            momAllrPro = parseInt(momFourPro + momFivePro, 10);
+            this.$emit('momAllrPro', momAllrPro);
             this.time++;
             this.xData.push(this.time);
             this.fourProxxx.push(momFourPro);

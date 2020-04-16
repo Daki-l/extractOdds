@@ -1,42 +1,54 @@
 <template>
-  <div class="hello">
-    <div class="left-box">
+    <div class="hello">
         <div class="btn-list">
-        <button @click="btnClick">抽取</button>
-        <button @click="btnClickTen">抽取10次</button>
-        <button @click="resetClick">小黄书概率</button>
-        <button @click="resetClick2">光暗概率</button>
-        <button @click="automatic">自动抽取</button>
-        <button @click="stop">停止</button>
-        <button @click="clearClick">clear</button>
+            <button @click="btnClick">抽取</button>
+            <button @click="btnClickTen">抽取10次</button>
+            <button @click="resetClick">小黄书概率</button>
+            <button @click="resetClick2">光暗概率</button>
+            <button @click="automatic">自动抽取</button>
+            <button @click="stop">停止</button>
+            <button @click="clearClick">clear</button>
+            <button @click="showResult = !showResult">显示结果</button>
         </div>
-        <div class="probxx-box">
-            <p>概率 {{ allproba()  + '%' }}</p>
-            总数<br>{{getArr.length}} 个
-            <p>
-                <span v-if="isYellow">(0.5%)</span>
-                <span v-if="!isYellow">(0.3%)</span>
-                5星
-                <br>
-                {{ !!fiveProbxx ? fiveProbxx : 0 + '%'}}
-            </p>
-            <p>
-                <span v-if="isYellow">(8.0%)</span>
-                <span v-if="!isYellow">(6.0%)</span>
-                4星
-                <br>
-                {{fourProbxx+ '%'}}
-            </p>
+        <echars ref="myEchars"
+            @momAllrPro="momAllrPro"
+        ></echars>
+        <div class="contant">
+            <div class="left-box" v-if="showResult">
+                <div class="result-box" id="box">
+                    <div class="result-item">
+                        <p class="result-title">抽取结果</p>
+                        <span v-for="(data, index) in getArr" :key="index" :class="data.type">{{data.name}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="right-box">
+                <div class="show-hightProbability">
+                    <span class="text" v-for="(d, i) in hightProbabilities" :key="i">
+                        done{{d}}
+                    </span>
+                </div>
+                <div class="probxx-box">
+                    <p>概率 {{ allproba()  + '%' }}</p>
+                    总数<br>{{getArr.length}} 个
+                    <p>
+                        <span v-if="isYellow">(0.5%)</span>
+                        <span v-if="!isYellow">(0.3%)</span>
+                        5星
+                        <br>
+                        {{ !!fiveProbxx ? fiveProbxx : 0 + '%'}}
+                    </p>
+                    <p>
+                        <span v-if="isYellow">(8.0%)</span>
+                        <span v-if="!isYellow">(6.0%)</span>
+                        4星
+                        <br>
+                        {{fourProbxx+ '%'}}
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="result-box" id="box">
-        <h4>抽取结果</h4>
-        <div class="result-item">
-            <span v-for="(data, index) in getArr" :key="index" :class="data.type">{{data.name}}</span>
-        </div>
-    </div>
-    <echars ref="myEchars"></echars>
-  </div>
 </template>
 
 <script>
@@ -50,10 +62,12 @@ export default {
         return {
             msg: '',
             isYellow: true,
+            showResult: false,
             time: '',
             clickColum: 0,
             temArr: [],
-            getArr: []
+            getArr: [],
+            hightProbabilities: []
         };
     },
     mounted() {
@@ -74,7 +88,7 @@ export default {
             this.rloading();
         },
         btnClick() {
-            var idd = parseInt(Math.random() * 1000);
+            var idd = parseInt(Math.random() * 1000, 10);
             var arr = this.temArr;
             this.getArr.push({
                 name: arr[idd].name,
@@ -86,7 +100,7 @@ export default {
         btnClickTen() {
             var arr = this.temArr;
             for (var i = 0; i < 10; i ++) {
-                var idd = parseInt(Math.random() * 1000);
+                var idd = parseInt(Math.random() * 1000, 10);
                 this.getArr.push({
                     name: arr[idd].name,
                     type: arr[idd].type,
@@ -100,7 +114,7 @@ export default {
             var fourArrIndexArr = [];
             // 生成5星数据
             for (var i = 0; i < 5; i++) {
-                fiveArrIndexArr[i] = parseInt(Math.random() * 1000);
+                fiveArrIndexArr[i] = parseInt(Math.random() * 1000, 10);
                 for (var j = 0; j < i; j++) {
                     if (fiveArrIndexArr[i] === fiveArrIndexArr[j]) {
                         i--;
@@ -110,7 +124,7 @@ export default {
             }
             // 生成4星数据
             for (var i = 0; i < 80; i++) {
-                fourArrIndexArr[i] = parseInt(Math.random() * 1000);
+                fourArrIndexArr[i] = parseInt(Math.random() * 1000, 10);
                 for (var j = 0; j < i; j++) {
                     if (fourArrIndexArr[i] === fourArrIndexArr[j]) {
                         i--;
@@ -124,7 +138,6 @@ export default {
                     }
                 }
             }
-            console.log('fiveArrIndexArr', fiveArrIndexArr, fourArrIndexArr)
             for (var i = 0; i < fiveArrIndexArr.length; i++) {
                 this.temArr[fiveArrIndexArr[i]] = {
                     name: '五星',
@@ -146,18 +159,17 @@ export default {
             var fourArrIndexArr = [];
             // 生成5星数据
             for (var i = 0; i < 3; i++) {
-                fiveArrIndexArr[i] = parseInt(Math.random() * 1000);
+                fiveArrIndexArr[i] = parseInt(Math.random() * 1000, 10);
                 for (var j = 0; j < i; j++) {
                     if (fiveArrIndexArr[i] === fiveArrIndexArr[j]) {
                         i--;
                         break;
                     }
                 }
-                
             }
             // 生成4星数据
             for (var i = 0; i < 60; i++) {
-                fourArrIndexArr[i] = parseInt(Math.random() * 1000);
+                fourArrIndexArr[i] = parseInt(Math.random() * 1000, 10);
                 for (var j = 0; j < i; j++) {
                     if (fourArrIndexArr[i] === fourArrIndexArr[j]) {
                         i--;
@@ -224,11 +236,11 @@ export default {
                         momArr = [];
                     }
                     for (var i = 0; i < 20; i++) {
-                        if (mi > 1000) {
+                        if (mi > 10000) {
                             clearInterval(this.time);
                             return;
                         }
-                        var idd = parseInt(Math.random() * 1000);
+                        var idd = parseInt(Math.random() * 1000, 10);
                         this.getArr.push({
                             name: arr[idd].name,
                             type: arr[idd].type,
@@ -240,7 +252,7 @@ export default {
                             id: arr[idd].id
                         });
                     }
-                    if (this.getArr.length >= 10000) {
+                    if (this.getArr.length >= 4000) {
                         this.clearClick();
                     }
                 }, 100);
@@ -254,6 +266,12 @@ export default {
         clearClick() {
             this.getArr = [];
             this.$refs.myEchars.clear();
+            this.clickColum = 0;
+        },
+        momAllrPro(data) {
+            if (Number.parseFloat(data) >= 30) {
+                this.hightProbabilities.push(data);
+            }
         }
     },
     computed: {
@@ -291,32 +309,42 @@ export default {
 <style>
 .left-box {
     width: 34%;
-    margin-top: 60px;
+    overflow: hidden;
+    width: 60vw;
+    border: solid 1px;
 }
 .btn-list{
     overflow: hidden;
     line-height: 30px;
+    padding: 10px 0 0 0;
 }
 .btn-list button{
     margin-left: 5px;
 }
+.contant {
+    display: flex;
+    justify-content: space-between;
+}
+.right-box {
+    width: 40vw;
+}
 
 .result-box{
-    float: right;
-    width: 60%;
-    position: absolute;
-    right: 20px;
-    top: 20px;
+    height: 50vh;
 }
 .result-item{
     text-align: left;
-    border: solid 1px black;
-    height: 70vh;
+    height: 50vh;
     overflow-y: auto;
+}
+.result-title {
+    font-size: 18px;
+    font-weight: 700;
+    padding: 5px;
 }
 .result-item span{
     display: inline-block;
-    width: 55px;
+    width: 13vw;
     text-align: center;
     margin-bottom: 10px;
 }
@@ -325,5 +353,15 @@ export default {
 }
 .five{
     color: red;
+}
+.hello .echars-box, .hello .echars-box>div, .hello .canvas {
+    width: 100vw;
+    height: 30vh;
+    overflow: hidden;
+}
+.show-hightProbability {
+    border: solid 1px black;
+    color: #6a09ff;
+    min-height: 20px;
 }
 </style>

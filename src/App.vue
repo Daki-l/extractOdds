@@ -6,7 +6,16 @@
 
 <script>
 export default {
-    name: 'App'
+    name: 'App',
+    created() {
+        if (document.documentElement.clientWidth > 640) {
+            require('./style/index.css');
+            this.plaform = 'pc';
+        } else {
+            require('./style/mobile.css');
+            this.plaform = 'mobile';
+        }
+    }
 };
 </script>
 
